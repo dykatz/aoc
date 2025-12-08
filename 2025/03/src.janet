@@ -11,10 +11,10 @@
   (for i 0 num
     (def line-slice (array/slice line start (- i num)))
     (def slice-max (max ;line-slice))
-    (for j 0 (- (length line) (- num 1))
+    (for j 0 (length line-slice)
       (if (= slice-max (line-slice j))
         (do
-          (set start (+ j 1))
+          (+= start j 1)
           (break))))
     (set jolts (+ slice-max (* jolts 10))))
   jolts)
