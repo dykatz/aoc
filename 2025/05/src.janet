@@ -41,7 +41,7 @@
         (put non-overlapping-ranges a-id [(min a-start b-start) (max a-end b-end)])
         (break))))
   (if clean
-    (if (= a-id (length non-overlapping-ranges))
+    (if (= a-id (- (length non-overlapping-ranges) 1))
       (break)
       (++ a-id))))
 
