@@ -12,11 +12,10 @@
 (defn invalid-id? [id]
   (def num-digits (+ 1 (math/floor (math/log10 id))))
   (var is-invalid false)
-  (for i 1 (+ 1 (/ num-digits 2))
+  (for i 1 num-digits
     (def j (/ num-digits i))
     (if (= j (math/floor j))
       (do
-        (var is-invalid-by-split true)
         (def pow-10 (math/pow 10 i))
         (def base (% id pow-10))
         (var num base)
