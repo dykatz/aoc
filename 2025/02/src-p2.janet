@@ -12,26 +12,17 @@
 (defn invalid-id? [id]
   (def num-digits (+ 1 (math/floor (math/log10 id))))
   (var is-invalid false)
-  (for i 2 (+ 1 (/ num-digits 2))
+  (for i 1 (+ 1 (/ num-digits 2))
     (def j (/ num-digits i))
     (if (= j (math/floor j))
       (do
-        (def base-divider (math/pow 10 i))
-        (var base-split-value nil)
-        (var id-for-base id)
         (var is-invalid-by-split true)
-        (for k 0 j
-          (def l (- j k 1))
-          (def divider (math/pow base-divider l))
-          (def split-value (math/floor (/ id-for-base divider)))
-          (-= id-for-base (* split-value divider))
-          (if (= base-split-value nil)
-            (set base-split-value split-value))
-          (if (not= base-split-value split-value)
-            (do
-              (set is-invalid-by-split false)
-              (break))))
-        (if is-invalid-by-split
+        (def pow-10 (math/pow 10 i))
+        (def base (% id pow-10))
+        (var num base)
+        (for k 1 j
+          (set num (+ base (* num pow-10))))
+        (if (= id num)
           (do
             (set is-invalid true)
             (break))))))
