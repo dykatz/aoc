@@ -10,24 +10,40 @@
 (while (not (empty? (def line (getline))))
   (def parsed-line (peg/match gram line))
   (if (array? parsed-line)
-    (put graph (parsed-line 0) (frequencies (parsed-line 1)))
+    (put graph (parsed-line 0) (parsed-line 1))
     (break)))
 
-(def stack @["svr"])
-(var total 0)
+(defn cached-count-paths [start successors success cache]
+  (def cached (cache start))
+  (if cached
+    cached
+    (if (success start)
+      (do
+        (put cache start 1)
+        1)
+      (do
+        (def result
+          (sum
+            (map
+              (fn [s] (cached-count-paths s successors success cache))
+              (successors start))))
+        (put cache start result)
+        result))))
 
-(defn dfs-impl []
-  (def from (array/peek stack))
-  (if (= from "out")
-    (if (and (has-value? stack "dac") (has-value? stack "fft"))
-      (++ total))
-    (if (table? (graph from))
-      (loop [conn :keys (graph from)
-             :when (not (has-value? stack conn))]
-        (array/push stack conn)
-        (dfs-impl)
-        (array/pop stack)))))
+(defn count-paths [start successors success]
+  (def cache @{})
+  (cached-count-paths start successors success cache))
 
-(dfs-impl)
+(defn successors-from-start [[label fft dac]]
+  (map
+    (fn [next-label] [next-label
+      (or fft (= next-label "fft"))
+      (or dac (= next-label "dac"))]) (or (graph label) [])))
 
-(print "svr -> out: " total)
+(def initial-node ["svr" false false])
+(def success-node ["out" true true])
+
+(defn success-from-start [start] (= start success-node))
+
+(print "svr -> out: "
+  (count-paths initial-node successors-from-start success-from-start))
